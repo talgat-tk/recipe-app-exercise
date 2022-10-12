@@ -131,3 +131,24 @@ class RecipeApiTest(TestCase):
         recipe.refresh_from_db()
         self.assertEqual(recipe.name, payload['name'])
         self.assertEqual(recipe.description, payload['description'])
+
+    def test_create_recipe_with_ingredients(self):
+        payload = {
+            'name': 'Breakfast',
+            'description': 'Description for breakfast',
+            'ingredients': [{
+                'name': 'Eggs',
+            }, {
+                'name': 'Toast',
+            }]
+        }
+
+        res = self.client.post(RECIPES_URL, payload)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        recipe = Recipe.objects.get(id=res.data['id'])
+        for ingredient in payload['ingredients']:
+            exists = recipe.ingredient_set.filter(
+                name=ingredient['name']
+            ).exists()
+            self.assertTrue(exists)
