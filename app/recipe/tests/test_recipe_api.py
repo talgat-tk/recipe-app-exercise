@@ -65,3 +65,14 @@ class RecipeApiTest(TestCase):
         serializer = RecipeSerializer(recipe)
 
         self.assertEqual(res.data, serializer.data)
+
+    def test_delete_recipe(self):
+        recipe = create_recipe(name='Lunch')
+
+        url = detail_url(recipe.id)
+
+        res = self.client.delete(url)
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+
+        exists = Recipe.objects.filter(id=recipe.id)
+        self.assertFalse(exists)
