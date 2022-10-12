@@ -4,7 +4,10 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
 
-from recipe.models import Recipe
+from recipe.models import (
+    Recipe,
+    Ingredient,
+)
 from recipe.serializers import RecipeSerializer
 
 
@@ -148,3 +151,31 @@ class RecipeApiTest(TestCase):
 
         for ingredient in payload['ingredients']:
             self.assertIn(ingredient, res.data['ingredients'])
+
+    def test_patch_recipe_with_ingredients(self):
+        recipe = create_recipe(
+            name='Breakfast',
+            description='Good recipe',
+        )
+        Ingredient.objects.create(name='Eggs', recipe=recipe)
+        Ingredient.objects.create(name='Toast', recipe=recipe)
+
+        payload = {
+            'ingredients': [
+                {'name': 'Coffee'},
+            ]
+        }
+
+        url = detail_url(recipe.id)
+
+        res = self.client.patch(url, payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        recipe.refresh_from_db()
+        self.assertEqual(len(recipe.ingredients.all()), 1)
+        for ingredient in payload['ingredients']:
+            exists = recipe.ingredients.filter(
+                name=ingredient['name']
+            ).exists()
+            self.assertTrue(exists)
