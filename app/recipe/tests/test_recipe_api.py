@@ -76,3 +76,19 @@ class RecipeApiTest(TestCase):
 
         exists = Recipe.objects.filter(id=recipe.id)
         self.assertFalse(exists)
+
+    def test_patch_recipe(self):
+        name = 'Dinner'
+        recipe = create_recipe(name=name)
+
+        url = detail_url(recipe.id)
+        payload = {
+            'description': 'Description for dinner'
+        }
+
+        res = self.client.patch(url, payload)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        recipe.refresh_from_db()
+        self.assertEqual(recipe.name, name)
+        self.assertEqual(recipe.description, payload['description'])
