@@ -27,4 +27,4 @@ class ModelTest(TestCase):
 
         self.assertEqual(str(ingredient), ingredient.name)
         self.assertEqual(ingredient.recipe, recipe)
-        self.assertIn(ingredient, recipe.ingredient_set.all())
+        self.assertIn(ingredient, recipe.ingredients.all())
