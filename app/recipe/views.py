@@ -9,4 +9,10 @@ class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
 
     def get_queryset(self):
-        return self.queryset.order_by('-id')
+        name = self.request.query_params.get('name')
+
+        queryset = self.queryset
+        if name:
+            queryset = queryset.filter(name__startswith=name)
+
+        return queryset.order_by('-id')
