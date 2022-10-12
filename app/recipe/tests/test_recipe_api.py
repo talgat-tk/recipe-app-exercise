@@ -92,3 +92,42 @@ class RecipeApiTest(TestCase):
         recipe.refresh_from_db()
         self.assertEqual(recipe.name, name)
         self.assertEqual(recipe.description, payload['description'])
+
+    def test_put_recipe_incomplete(self):
+        initial = {
+            'name': 'Breakfast',
+            'description': 'Description for breakfast',
+        }
+        recipe = create_recipe(**initial)
+
+        url = detail_url(recipe.id)
+        payload = {
+            'description': 'Incorrect payload description'
+        }
+
+        res = self.client.put(url, payload)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+        recipe.refresh_from_db()
+        self.assertEqual(recipe.name, initial['name'])
+        self.assertEqual(recipe.description, initial['description'])
+
+    def test_put_recipe(self):
+        initial = {
+            'name': 'Lunch',
+            'description': 'Description for lunch',
+        }
+        recipe = create_recipe(**initial)
+
+        url = detail_url(recipe.id)
+        payload = {
+            'name': 'Dinner',
+            'description': 'Description for dinner',
+        }
+
+        res = self.client.put(url, payload)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        recipe.refresh_from_db()
+        self.assertEqual(recipe.name, payload['name'])
+        self.assertEqual(recipe.description, payload['description'])
