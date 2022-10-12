@@ -192,3 +192,30 @@ class RecipeApiTest(TestCase):
         self.client.delete(url)
 
         self.assertEqual(len(recipe.ingredients.all()), 0)
+
+    def test_search_recipe_by_name(self):
+        recipe_1 = create_recipe(
+            name='Breakfast',
+            description='Breakfast recipe',
+        )
+        recipe_2 = create_recipe(
+            name='Break Dance',
+            description='Nice',
+        )
+        create_recipe(
+            name='Lunch',
+            description='Lunch recipe',
+        )
+
+        params = {
+            'name': 'Break'
+        }
+        res = self.client.get(RECIPES_URL, params)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 2)
+
+        serializer_1 = RecipeSerializer(recipe_1)
+        serializer_2 = RecipeSerializer(recipe_2)
+
+        self.assertIn(serializer_1.data, res.data)
+        self.assertIn(serializer_2.data, res.data)
