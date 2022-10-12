@@ -179,3 +179,16 @@ class RecipeApiTest(TestCase):
                 name=ingredient['name']
             ).exists()
             self.assertTrue(exists)
+
+    def test_delete_recipe_with_ingredients(self):
+        recipe = create_recipe(
+            name='Lunch',
+            description='Lunch recipe',
+        )
+        Ingredient.objects.create(name='Soup', recipe=recipe)
+        Ingredient.objects.create(name='Steak', recipe=recipe)
+
+        url = detail_url(recipe.id)
+        self.client.delete(url)
+
+        self.assertEqual(len(recipe.ingredients.all()), 0)
