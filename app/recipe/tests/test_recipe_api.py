@@ -143,12 +143,8 @@ class RecipeApiTest(TestCase):
             }]
         }
 
-        res = self.client.post(RECIPES_URL, payload)
+        res = self.client.post(RECIPES_URL, payload, format='json')
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
-        recipe = Recipe.objects.get(id=res.data['id'])
         for ingredient in payload['ingredients']:
-            exists = recipe.ingredient_set.filter(
-                name=ingredient['name']
-            ).exists()
-            self.assertTrue(exists)
+            self.assertIn(ingredient, res.data['ingredients'])
