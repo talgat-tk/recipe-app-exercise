@@ -65,9 +65,13 @@ class RecipeApiTest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
         recipe = Recipe.objects.get(id=res.data['id'])
-        serializer = RecipeSerializer(recipe)
 
-        self.assertEqual(res.data, serializer.data)
+        recipe_data = {
+            'name': recipe.name,
+            'description': recipe.description,
+        }
+
+        self.assertEqual(payload, recipe_data)
 
     def test_delete_recipe(self):
         recipe = create_recipe(name='Lunch')
