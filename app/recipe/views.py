@@ -13,6 +13,6 @@ class RecipeViewSet(ModelViewSet):
 
         queryset = self.queryset
         if name:
-            queryset = queryset.filter(name__startswith=name)
+            queryset = queryset.filter(name__istartswith=name)
 
         return queryset.order_by('-id')
