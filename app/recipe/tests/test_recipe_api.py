@@ -177,12 +177,16 @@ class RecipeApiTest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
         recipe.refresh_from_db()
-        self.assertEqual(len(recipe.ingredients.all()), 1)
-        for ingredient in payload['ingredients']:
-            exists = recipe.ingredients.filter(
-                name=ingredient['name']
-            ).exists()
-            self.assertTrue(exists)
+
+        ingredients = list(recipe.ingredients.all())
+
+        self.assertEqual(len(ingredients), len(payload['ingredients']))
+
+        for ingredient in ingredients:
+            ingredient_data = {
+                'name': ingredient.name,
+            }
+            self.assertTrue(ingredient_data in payload['ingredients'])
 
     def test_delete_recipe_with_ingredients(self):
         recipe = create_recipe(
