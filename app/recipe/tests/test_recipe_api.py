@@ -199,15 +199,37 @@ class RecipeApiTest(TestCase):
         url = detail_url(recipe.id)
         self.client.delete(url)
 
-        self.assertEqual(len(recipe.ingredients.all()), 0)
+        self.assertEqual(recipe.ingredients.count(), 0)
 
-    def test_search_recipe_by_name(self):
+    def test_case_sensitive_search_recipe_by_name(self):
+        recipe = create_recipe(
+            name='Breakfast',
+            description='Breakfast recipe',
+        )
+        create_recipe(
+            name='Lunch',
+            description='Lunch recipe',
+        )
+
+        params = {
+            'name': 'Break'
+        }
+
+        res = self.client.get(RECIPES_URL, params)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 1)
+
+        serializer = RecipeSerializer(recipe)
+
+        self.assertIn(serializer.data, res.data)
+
+    def test_case_insensitive_search_recipe_by_name(self):
         recipe_1 = create_recipe(
             name='Breakfast',
             description='Breakfast recipe',
         )
         recipe_2 = create_recipe(
-            name='Break Dance',
+            name='break Dance',
             description='Nice',
         )
         create_recipe(
